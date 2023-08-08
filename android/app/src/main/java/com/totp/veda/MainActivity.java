@@ -1,4 +1,4 @@
-package com.totp.veda;
+package com.BlueStoneStudio.veda;
 
 import io.flutter.embedding.android.FlutterActivity;
 

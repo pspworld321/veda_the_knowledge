@@ -11,14 +11,29 @@ import 'package:veda/global.dart';
 import 'package:share/share.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class TextReading extends StatelessWidget {
-  final indexOfText;
+import 'adsUnits.dart';
 
-  TextReading(this.indexOfText);
+class TextReading extends StatefulWidget {
+  final title;
+  final nameEnglish;
+  TextReading(this.title, this.nameEnglish);
+
+  @override
+  State<StatefulWidget> createState() {
+    return TextReadingState(title,nameEnglish);
+  }
+}
+class TextReadingState extends State<TextReading> {
+  final title;
+  final nameEnglish;
+
+  TextReadingState(this.title, this.nameEnglish);
+
+  static ValueNotifier adNotifier = ValueNotifier(0);
+  AdsUnits adsUnits = AdsUnits();
 
   var ctx;
   var dataBox;
-  var title;
   var translateBox;
   Map bookmarks = {};
   Map index = {};
@@ -34,10 +49,14 @@ class TextReading extends StatelessWidget {
   Color buttonsColor = Colors.lightBlueAccent;
 
   @override
+  void initState() {
+    adsUnits.loadBanner3();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext ctx) {
     this.ctx = ctx;
-    title = Global.languageVedaMap[Global.settings['language']][indexOfText].toString().capitalizeFirstofEach;
-    var titleEnglish = Global.languageVedaMap['english'][indexOfText].toString().capitalizeFirstofEach;
     fontSize = Global.settings['textFontSize'];
     return WillPopScope(
         onWillPop: () async {
@@ -46,7 +65,7 @@ class TextReading extends StatelessWidget {
         },
         child: Scaffold(
             backgroundColor: Global.canvasColor(),
-            appBar: AppBar(
+            appBar: AppBar(backgroundColor: Colors.lightBlueAccent,
               iconTheme: IconThemeData(color: Colors.white),
               actions: [
                 IconButton(
@@ -119,8 +138,7 @@ class TextReading extends StatelessWidget {
                                                 return TextButton(
                                                   style: ButtonStyle(
                                                       backgroundColor: versePlaying && i == versePlayingIndex
-                                                          ? MaterialStateProperty.all(
-                                                              Color.fromRGBO(108, 190, 217, 0.15))
+                                                          ? MaterialStateProperty.all(Color.fromRGBO(108, 190, 217, 0.15))
                                                           : MaterialStateProperty.all(Color.fromRGBO(10, 10, 10, 0))),
                                                   child: Align(
                                                     alignment: Alignment.centerLeft,
@@ -132,8 +150,7 @@ class TextReading extends StatelessWidget {
                                                                   text: verseMap['data'].substring(0, ttsStartOffset),
                                                                   style: DataTextStylePlayed(verseMap)),
                                                               TextSpan(
-                                                                  text: verseMap['data']
-                                                                      .substring(ttsStartOffset, ttsEndOffset),
+                                                                  text: verseMap['data'].substring(ttsStartOffset, ttsEndOffset),
                                                                   style: DataTextStylePlayed(verseMap)),
                                                               TextSpan(
                                                                   text: verseMap['data'].substring(ttsEndOffset),
@@ -151,23 +168,43 @@ class TextReading extends StatelessWidget {
                                                         builder: (BuildContext cntxt) {
                                                           return Padding(
                                                               padding: EdgeInsets.fromLTRB(15, 20, 15, 20),
-                                                              child: Align(
-                                                                  alignment: Alignment.bottomCenter,
-                                                                  child: Material(
+                                                              child: Column(
+                                                                // alignment: Alignment.bottomCenter,
+                                                                  children: [
+                                                                    SizedBox(
+                                                                      height: 60,
+                                                                    ),
+                                                                    adsUnits.googleBannerAd3(),
+                                                                    Spacer(),
+                                                                    Container(
+                                                                      padding:  EdgeInsets.fromLTRB(10, 10, 10,10),
+                                                                      decoration: BoxDecoration(
+                                                                          borderRadius: BorderRadius.circular(5.0), color: Color.fromARGB(70, 0, 0, 0)),
+                                                                      child: Text(
+                                                                        verseMap['data'].toString().length > 120
+                                                                            ? verseMap['data'].toString().substring(0, 119) + '...'
+                                                                            : verseMap['data'].toString(),
+                                                                        style:
+                                                                        TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500
+                                                                            ,inherit: false),
+                                                                        textAlign: TextAlign.center,
+                                                                      ),
+                                                                    ),
+                                                                    SizedBox(
+                                                                      height: 20,
+                                                                    ),
+                                                                    Material(
                                                                       //  color: Color.fromARGB(0, 0, 0, 0),
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.circular(5.0)),
-                                                                      child: Container(
-                                                                        decoration: BoxDecoration(
-                                                                            borderRadius: BorderRadius.circular(5.0),
-                                                                            color: Global.canvasColor()),
-                                                                        //  height: (MediaQuery.of(ctx).size.height * 2) / 3,
-                                                                        child: Padding(
-                                                                            padding:
-                                                                                EdgeInsets.fromLTRB(15, 10, 15, 10),
-                                                                            child: OptionsButtons(cntxt, verseMap, i,
-                                                                                title, titleEnglish)),
-                                                                      ))));
+                                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                                                                        child: Container(
+                                                                          decoration: BoxDecoration(
+                                                                              borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
+                                                                          //  height: (MediaQuery.of(ctx).size.height * 2) / 3,
+                                                                          child: Padding(
+                                                                              padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                                                                              child: OptionsButtons(cntxt, verseMap, i, title)),
+                                                                        ))
+                                                                  ]));
                                                         });
                                                   },
                                                 );
@@ -184,8 +221,7 @@ class TextReading extends StatelessWidget {
                                                         height: 45,
                                                         width: 45,
                                                         decoration: BoxDecoration(
-                                                            borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                                                            color: Colors.lightBlueAccent),
+                                                            borderRadius: BorderRadius.all(Radius.circular(5.0)), color: Colors.lightBlueAccent),
                                                         child: Icon(
                                                           Icons.view_list_outlined,
                                                           size: 33,
@@ -203,8 +239,7 @@ class TextReading extends StatelessWidget {
                                                           height: 45,
                                                           width: 45,
                                                           decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                                              color: Colors.lightBlueAccent),
+                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)), color: Colors.lightBlueAccent),
                                                           child: Icon(
                                                             Icons.settings,
                                                             size: 28,
@@ -230,8 +265,7 @@ class TextReading extends StatelessWidget {
                                                           height: 55,
                                                           width: 55,
                                                           decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                                              color: Colors.lightBlueAccent),
+                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)), color: Colors.lightBlueAccent),
                                                           child: Icon(
                                                             Icons.stop,
                                                             size: 30,
@@ -253,8 +287,7 @@ class TextReading extends StatelessWidget {
                                                           height: 45,
                                                           width: 45,
                                                           decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)),
-                                                              color: Colors.lightBlueAccent),
+                                                              borderRadius: BorderRadius.all(Radius.circular(50.0)), color: Colors.lightBlueAccent),
                                                           child: Icon(
                                                             Icons.skip_next,
                                                             size: 28,
@@ -277,8 +310,7 @@ class TextReading extends StatelessWidget {
                                                       height: 45,
                                                       width: 45,
                                                       decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                                                          color: Colors.lightBlueAccent),
+                                                          borderRadius: BorderRadius.all(Radius.circular(5.0)), color: Colors.lightBlueAccent),
                                                       child: Icon(
                                                         Icons.keyboard_arrow_up,
                                                         size: 40,
@@ -286,8 +318,7 @@ class TextReading extends StatelessWidget {
                                                       ),
                                                     ),
                                                     onTap: () {
-                                                      scrollController.scrollTo(
-                                                          index: 0, duration: Duration(milliseconds: 500));
+                                                      scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 500));
                                                     },
                                                   )
                                                 ],
@@ -342,8 +373,7 @@ class TextReading extends StatelessWidget {
                                   color: Color.fromARGB(0, 0, 0, 0),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                                   child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
                                       constraints: BoxConstraints(maxHeight: (MediaQuery.of(ctx).size.height * 2) / 3),
                                       //  height: (MediaQuery.of(ctx).size.height * 2) / 3,
                                       child: Padding(
@@ -362,8 +392,7 @@ class TextReading extends StatelessWidget {
                                                       children: [
                                                         Text(
                                                           title,
-                                                          style: TextStyle(
-                                                              fontWeight: FontWeight.w600, color: Colors.black87),
+                                                          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87),
                                                         )
                                                       ],
                                                     ),
@@ -373,8 +402,7 @@ class TextReading extends StatelessWidget {
                                                   child: SingleChildScrollView(
                                                     child: SelectableText(
                                                       verseMap['data'] + '\n\n' + translateBox.getAt(i)['data'],
-                                                      style: TextStyle(
-                                                          color: Global.normalTextColor(), fontSize: fontSize),
+                                                      style: TextStyle(color: Global.normalTextColor(), fontSize: fontSize),
                                                     ),
                                                   )),
                                               Expanded(
@@ -401,18 +429,14 @@ class TextReading extends StatelessWidget {
                                                                   flex: 0,
                                                                   child: Text(
                                                                     'Choose Language : ',
-                                                                    style: TextStyle(
-                                                                        color: Global.bookmarkColor(), fontSize: 15),
+                                                                    style: TextStyle(color: Global.bookmarkColor(), fontSize: 15),
                                                                   ),
                                                                 ),
                                                                 Expanded(
                                                                   flex: 0,
                                                                   child: Text(
-                                                                    Global.settings['translateLanguage']
-                                                                        .toString()
-                                                                        .capitalizeFirstofEach,
-                                                                    style: TextStyle(
-                                                                        color: Global.normalTextColor(), fontSize: 17),
+                                                                    Global.settings['translateLanguage'].toString().capitalizeFirstofEach,
+                                                                    style: TextStyle(color: Global.normalTextColor(), fontSize: 17),
                                                                   ),
                                                                 ),
                                                                 Expanded(
@@ -432,16 +456,11 @@ class TextReading extends StatelessWidget {
                                                                       child: ListView(
                                                                         shrinkWrap: true,
                                                                         children: [
-                                                                          for (int i = 0;
-                                                                              i < Global.language.length;
-                                                                              i++)
+                                                                          for (int i = 0; i < Global.language.length; i++)
                                                                             ListTile(
-                                                                              title: Text(Global.language[i]
-                                                                                  .toString()
-                                                                                  .capitalizeFirstofEach),
+                                                                              title: Text(Global.language[i].toString().capitalizeFirstofEach),
                                                                               onTap: () {
-                                                                                Global.settings['translateLanguage'] =
-                                                                                    Global.language[i];
+                                                                                Global.settings['translateLanguage'] = Global.language[i];
                                                                                 translateNotifier.value++;
                                                                                 Navigator.pop(cntxt);
                                                                                 Global.saveSettings();
@@ -462,24 +481,24 @@ class TextReading extends StatelessWidget {
         });
   }
 
-  shareButtonClick(verseMap, title, titleEnglish) {
-    Share.share('${verseMap['data']}\n\n- $title', subject: 'A verse from $titleEnglish');
+  shareButtonClick(verseMap, title) {
+    Share.share('${verseMap['data']}\n\n- $title', subject: 'A verse from $title');
   }
 
   speakButtonClick(i) async {
     ttsStartOffset = 0;
     ttsEndOffset = 0;
     flutterTts = new FlutterTts();
-    await flutterTts.setVolume(1.0);
-    await flutterTts.setPitch(0.9);
+    // await flutterTts.setVolume(1.0);
+    // await flutterTts.setPitch(0.9);
     if (Global.settings['language'] == Global.language[2]) {
-      await flutterTts.setSpeechRate(0.6);
+      // await flutterTts.setSpeechRate(0.6);
       await flutterTts.setVoice({'name': 'hi-in-x-cfn-local', 'locale': 'hi-IN'});
     } else if (Global.settings['language'] == Global.language[1]) {
-      await flutterTts.setSpeechRate(0.78);
+      // await flutterTts.setSpeechRate(0.78);
       await flutterTts.setVoice({'name': 'hi-in-x-cfn-local', 'locale': 'hi-IN'});
     } else {
-      await flutterTts.setSpeechRate(0.78);
+      // await flutterTts.setSpeechRate(0.78);
       await flutterTts.setVoice({'name': 'en-in-x-cxx-local', 'locale': 'en-IN'});
     }
     //await flutterTts.setSilence(1);
@@ -545,8 +564,7 @@ class TextReading extends StatelessWidget {
                       color: Color.fromARGB(0, 0, 0, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                       child: Container(
-                          decoration:
-                              BoxDecoration(borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
+                          decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
                           constraints: BoxConstraints(maxHeight: (MediaQuery.of(ctx).size.height * 2) / 3),
                           //  height: (MediaQuery.of(ctx).size.height * 2) / 3,
                           child: Padding(
@@ -582,8 +600,7 @@ class TextReading extends StatelessWidget {
                                                     return SingleChildScrollView(
                                                       child: SelectableText(
                                                         verseMap['data'] + '\n\n' + snapshot.data,
-                                                        style: TextStyle(
-                                                            color: Global.normalTextColor(), fontSize: fontSize),
+                                                        style: TextStyle(color: Global.normalTextColor(), fontSize: fontSize),
                                                       ),
                                                     );
                                                   } else {
@@ -647,11 +664,9 @@ class TextReading extends StatelessWidget {
                                                             children: [
                                                               for (int i = 0; i < GTranslate.languageMap.length; i++)
                                                                 ListTile(
-                                                                  title:
-                                                                      Text(GTranslate.languageMap.values.toList()[i]),
+                                                                  title: Text(GTranslate.languageMap.values.toList()[i]),
                                                                   onTap: () {
-                                                                    Global.settings['gTransLangCode'] =
-                                                                        GTranslate.languageMap.keys.toList()[i];
+                                                                    Global.settings['gTransLangCode'] = GTranslate.languageMap.keys.toList()[i];
                                                                     translateNotifier.value++;
                                                                     Navigator.pop(cntxt);
                                                                     Global.saveSettings();
@@ -670,7 +685,7 @@ class TextReading extends StatelessWidget {
         });
   }
 
-  OptionsButtons(cntxt, verseMap, i, title, titleEnglish) {
+  OptionsButtons(cntxt, verseMap, i, title) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -694,7 +709,7 @@ class TextReading extends StatelessWidget {
             color: buttonsColor,
           ),
           onPressed: () {
-            shareButtonClick(verseMap, title, titleEnglish);
+            shareButtonClick(verseMap, title);
             Navigator.pop(cntxt);
           },
         ),
@@ -740,9 +755,9 @@ class TextReading extends StatelessWidget {
   }
 
   loadData() async {
-    dataBox = await Hive.openBox(Global.languageVedaMap['english'][indexOfText] + '_' + (Global.settings['language']));
-    translateBox = await Hive.openBox(
-        Global.languageVedaMap['english'][indexOfText] + '_' + (Global.settings['translateLanguage']));
+
+    dataBox = await Hive.openBox(nameEnglish + '_' + (Global.settings['language']));
+    translateBox = await Hive.openBox(nameEnglish + '_' + (Global.settings['translateLanguage']));
 
     for (int i = 0; i < dataBox.length; i++) {
       if (dataBox.getAt(i)['type'] == 'title1') {
@@ -753,8 +768,7 @@ class TextReading extends StatelessWidget {
   }
 
   translateLanguage() async {
-    translateBox = await Hive.openBox(
-        Global.languageVedaMap['english'][indexOfText] + '_' + (Global.settings['translateLanguage']));
+    translateBox = await Hive.openBox(nameEnglish + '_' + (Global.settings['translateLanguage']));
   }
 
   gTransWarningDialog(verseMap, i) async {
@@ -789,10 +803,9 @@ class TextReading extends StatelessWidget {
         print(Global.settings['gTransLangCode']);
         final translator = GoogleTranslator();
         //getting veda name in english and 'english' language for the box opening
-        var box = await Hive.openBox(Global.languageVedaMap['english'][indexOfText] + '_' + (Global.language[1]));
+        var box = await Hive.openBox(nameEnglish + '_' + (Global.language[1]));
         var input = await box.getAt(i)['data'];
-        var translation =
-            await translator.translate(input.toString(), from: 'hi', to: Global.settings['gTransLangCode']);
+        var translation = await translator.translate(input.toString(), from: 'hi', to: Global.settings['gTransLangCode']);
         return translation.text;
       }
     } on SocketException catch (_) {
@@ -819,8 +832,7 @@ class TextReading extends StatelessWidget {
                       color: Color.fromARGB(0, 0, 0, 0),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
                       child: Container(
-                        decoration:
-                            BoxDecoration(borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
+                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(5.0), color: Global.canvasColor()),
                         height: (MediaQuery.of(ctx).size.height * 2) / 3,
                         child: Flex(
                           direction: Axis.vertical,
@@ -834,10 +846,7 @@ class TextReading extends StatelessWidget {
                                   height: 40,
                                   child: Row(
                                     children: [
-                                      Text(
-                                        Global.languageVedaMap[Global.settings['language']][indexOfText]
-                                                .toString()
-                                                .capitalizeFirstofEach +
+                                      Text(title.toString().capitalizeFirstofEach +
                                             ' Bookmarks',
                                         style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87),
                                       )
@@ -856,14 +865,11 @@ class TextReading extends StatelessWidget {
                                               onPressed: () {
                                                 Navigator.pop(cntxt);
                                                 scrollController.scrollTo(
-                                                    index: bookmarks.keys.toList()[i],
-                                                    duration: Duration(milliseconds: 400),
-                                                    curve: Curves.ease);
+                                                    index: bookmarks.keys.toList()[i], duration: Duration(milliseconds: 400), curve: Curves.ease);
                                               },
                                               child: Text(
                                                 bookmarks.values.toList()[i],
-                                                style:
-                                                    TextStyle(fontSize: fontSize - 1, color: Global.normalTextColor()),
+                                                style: TextStyle(fontSize: fontSize - 1, color: Global.normalTextColor()),
                                               ))
                                       ],
                                     ))),
@@ -899,8 +905,7 @@ class TextReading extends StatelessWidget {
                   ListTile(
                     onTap: () {
                       Navigator.pop(cntxt);
-                      scrollController.scrollTo(
-                          index: mapFitered.keys.toList()[i], duration: Duration(milliseconds: 400));
+                      scrollController.scrollTo(index: mapFitered.keys.toList()[i], duration: Duration(milliseconds: 400));
                     },
                     title: Padding(
                       padding: EdgeInsets.all(0),
@@ -936,8 +941,7 @@ class TextReading extends StatelessWidget {
                                       }
                                     }
                                     Navigator.pop(cntxt);
-                                    indexDialog(title + ' > ' + dataBox.getAt(mapFitered.keys.toList()[i])['data'],
-                                        nextMap, titleLevelCount + 1);
+                                    indexDialog(title + ' > ' + dataBox.getAt(mapFitered.keys.toList()[i])['data'], nextMap, titleLevelCount + 1);
                                   },
                                 ))
                         ],

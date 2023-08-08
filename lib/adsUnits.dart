@@ -3,8 +3,12 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'global.dart';
 import 'main.dart';
+import 'textReading.dart';
+import 'titleList.dart';
 
-final bannerAdId = 'ca-app-pub-5704045408668888/2774815220';
+final bannerAdId1 = 'ca-app-pub-5704045408668888/2774815220';
+final bannerAdId2 = 'ca-app-pub-5704045408668888/4213858662';
+final bannerAdId3 = 'ca-app-pub-5704045408668888/1774300109';
 final interAdId = 'ca-app-pub-5704045408668888/7636808407';
 
 class AdsUnits {
@@ -13,9 +17,13 @@ class AdsUnits {
   static bool interAdLoaded = false;
   static bool gAdClicked = false;
 
-  var myBanner;
+  var myBanner1;
+  var myBanner2;
+  var myBanner3;
+  var adWidget1;
+  var adWidget2;
+  var adWidget3;
   var interstitialAd;
-  var adWidget;
 
   loadInterAd() {
     InterstitialAd.load(
@@ -50,36 +58,53 @@ class AdsUnits {
     }
   }
 
+  loadBanner1() async {
+    myBanner1 = myBannerAd1;
+    adWidget1 = AdWidget(ad: myBanner1);
+    await myBanner1.load();
+    MyHomePageState.adNotifier.value++;
+  }
+
+  loadBanner2() async {
+    myBanner2 = myBannerAd2;
+    adWidget2 = AdWidget(ad: myBanner2);
+    await myBanner2.load();
+    TextReadingState.adNotifier.value++;
+  }
+
+  loadBanner3() async {
+    myBanner3 = myBannerAd3;
+    adWidget3 = AdWidget(ad: myBanner3);
+    await myBanner3.load();
+    TitleListState.adNotifier.value++;
+  }
+
   loadAds() async {
     try {
       MobileAds.instance.initialize().then((d) async {
-        AdsUnits adUnits = AdsUnits();
-        myBanner = adUnits.myBanner1;
-        adWidget = AdWidget(ad: myBanner);
-        await myBanner.load();
-        await loadInterAd();
         AdsUnits.admobInit = true;
-        //setState(() {});
-        MyHomePageState.adNotifier.value++;
+        loadBanner1();
+        loadBanner2();
+        loadBanner3();
+        loadInterAd();
+        // loadInterAd();
       });
     } catch (e) {
       AdsUnits.admobInit = false;
     }
   }
 
-  googleBannerAd() {
+  googleBannerAd1() {
     return ValueListenableBuilder(
       valueListenable: MyHomePageState.adNotifier,
       builder: (BuildContext context, value, Widget? child) {
-        return AdsUnits.admobInit &&
-            (Global.settings['gAdClickedTime'] == null ||
-                DateTime.now().difference(Global.settings['gAdClickedTime']).inSeconds > 10)
-            ? Container(padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+        return AdsUnits.admobInit
+            ? Container(margin:  EdgeInsets.fromLTRB(0, 20, 0, 0),
           alignment: Alignment.center,
-          child: adWidget,
-          width: myBanner1.size.width.toDouble(),
-          height: myBanner1.size.height.toDouble(),
-          // width: 300,
+          child: adWidget1,
+
+          width: myBannerAd1.size.width.toDouble(),
+          height: myBannerAd1.size.height.toDouble(),
         )
             : Container(
           width: 0,
@@ -90,21 +115,75 @@ class AdsUnits {
     );
   }
 
-  BannerAd myBanner1 = BannerAd(
-    adUnitId: bannerAdId,
+  googleBannerAd2() {
+    return ValueListenableBuilder(
+      valueListenable: TextReadingState.adNotifier,
+      builder: (BuildContext context, value, Widget? child) {
+        return AdsUnits.admobInit
+            ? Container(margin:  EdgeInsets.fromLTRB(0, 20, 0, 0),
+          alignment: Alignment.center,
+          child: adWidget2,
+
+          width: myBannerAd2.size.width.toDouble(),
+          height: myBannerAd2.size.height.toDouble(),
+        )
+            : Container(
+          width: 0,
+          height: 0,
+          // width: 300,
+        );
+      },
+    );
+  }
+
+  googleBannerAd3() {
+    return ValueListenableBuilder(
+      valueListenable: TitleListState.adNotifier,
+      builder: (BuildContext context, value, Widget? child) {
+        return AdsUnits.admobInit
+            ? Container(
+          alignment: Alignment.center,
+          child: adWidget3,
+
+          width: myBannerAd3.size.width.toDouble(),
+          height: myBannerAd3.size.height.toDouble(),
+        )
+            : Container(
+          width: 0,
+          height: 0,
+          // width: 300,
+        );
+      },
+    );
+  }
+
+  BannerAd myBannerAd1 = BannerAd(
+    adUnitId: bannerAdId1,
     size: AdSize.mediumRectangle,
     request: AdRequest(),
     listener: BannerAdListener(onAdFailedToLoad: (Ad, err) {
       print('Ad error.' + err.toString());
     },
-      onAdOpened: (Ad ad) {
-        print('Ad opened.');
-        AdsUnits.gAdClicked = true;
-        Global.settings['gAdClickedTime'] = DateTime.now();
-        Global.saveSettings();
-        print(AdsUnits.gAdClicked);
-        MyHomePageState.adNotifier.value++;
-      },
+    ),
+  );
+
+  BannerAd myBannerAd2 = BannerAd(
+    adUnitId: bannerAdId2,
+    size: AdSize.mediumRectangle,
+    request: AdRequest(),
+    listener: BannerAdListener(onAdFailedToLoad: (Ad, err) {
+      print('Ad error.' + err.toString());
+    },
+    ),
+  );
+
+  BannerAd myBannerAd3 = BannerAd(
+    adUnitId: bannerAdId3,
+    size: AdSize.mediumRectangle,
+    request: AdRequest(),
+    listener: BannerAdListener(onAdFailedToLoad: (Ad, err) {
+      print('Ad error.' + err.toString());
+    },
     ),
   );
 

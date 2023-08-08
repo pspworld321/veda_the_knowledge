@@ -1,15 +1,16 @@
 import 'dart:math';
 
-import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:veda/textReading.dart';
 
 import 'adsUnits.dart';
 import 'global.dart';
+import 'titleList.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Veda - Knowledge',
+      title: 'Vedic Wisdom',
       theme: ThemeData(primaryColor: Colors.lightBlueAccent),
       home: MyHomePage(),
     );
@@ -98,21 +99,24 @@ class MyHomePageState extends State<MyHomePage> {
                   children: [
                     Container(
                       color: Colors.lightBlueAccent,
-                      padding: EdgeInsets.fromLTRB(30, 25, 30, 20),
+                      padding: EdgeInsets.fromLTRB(20, 25, 30, 20),
                       child: Flex(
                         direction: Axis.horizontal,
                         children: [
                           Expanded(
                               child: Align(
                                   alignment: Alignment.centerLeft,
-                                  child: TextButton(
-                                      onPressed: null,
-                                      child: Text(
-                                        'The Knowledge',
-                                        style:
-                                        TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w500),
-                                        textAlign: TextAlign.start,
-                                      ))))
+                                  child: Row(children: [Image.asset(
+                                    'assets/images/bluestone.png',
+                                    width: 45,
+                                    height: 45,
+                                  ),
+                                    Text(
+                                      '  Blue Stone Studio',
+                                      style: TextStyle(color: Colors.white, fontSize: 25, fontWeight: FontWeight.w500),
+                                      textAlign: TextAlign.start,
+                                    )
+                                  ])))
                         ],
                       ),
                     ),
@@ -126,63 +130,95 @@ class MyHomePageState extends State<MyHomePage> {
                     ),
                   ],
                 ),
-                ListTile(
-                  leading: Padding(
-                      padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                      child: Icon(
-                        Icons.star,
-                        color: Colors.lightBlueAccent,
-                        size: 32,
-                      )),
-                  title: Text(
-                    'Rate this App',
-                    style: TextStyle(color: Colors.blueGrey.shade800, fontSize: 18, fontWeight: FontWeight.w400),
+                for (int j = 0; j < Global.titles['More...'].length; j++)
+                  ListTile(
+                    onTap: () {
+                      // launchUrlString(Global.titles['More...'].values.toList()[j][0]);
+                      launchUrl(Uri.parse(Global.titles['More...'].values.toList()[j][0]), mode: LaunchMode.externalApplication);
+                    },
+                    leading: Image.asset(
+                      Global.titles['More...'].values.toList()[j][1],
+                      height: 35,
+                      width: 35,
+                    ),
+                    title: Text(Global.titles['More...'].keys.toList()[j]),
+                    subtitle: Text(Global.titles['More...'].values.toList()[j][0], style: TextStyle(fontSize: 9)),
                   ),
-                  subtitle: Text('Help us Make it Better'),
-                  onTap: () async {
-                    Navigator.pop(cntxt);
-                    launch("https://play.google.com/store/apps/details?id=com.totp.veda");
-                  },
-                ),
-                ListTile(
-                  leading: Padding(
-                      padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                      child: Icon(
-                        Icons.share,
-                        color: Colors.lightBlueAccent,
-                        size: 32,
-                      )),
-                  title: Text(
-                    'Share this App',
-                    style: TextStyle(color: Colors.blueGrey.shade800, fontSize: 18, fontWeight: FontWeight.w400),
-                  ),
-                  onTap: () async {
-                    Navigator.pop(cntxt);
-                    Share.share(
-                        'Hey! Checkout this App.\nVeda, Upanishad & Gita in three languages.\n\n'
-                            'https://play.google.com/store/apps/details?id=com.totp.veda',
-                        subject: 'Bhagvad Gita');
-                  },
-                ),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(0, 0, 0, 8),
-                    child: ListTile(
-                      leading: Padding(
-                          padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                          child: Icon(
-                            Icons.apps,
-                            color: Colors.lightBlueAccent,
-                            size: 30,
-                          )),
-                      title: Text(
-                        'More Apps',
-                        style: TextStyle(color: Colors.blueGrey.shade800, fontSize: 18, fontWeight: FontWeight.w400),
-                      ),
-                      onTap: () async {
-                        Navigator.pop(cntxt);
-                        launch("https://play.google.com/store/apps/developer?id=Blue+Stone+Studio");
-                      },
-                    )),
+                Container(
+                    decoration: BoxDecoration(
+                        //  color: Colors.green,
+                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(4.0), bottomRight: Radius.circular(4.0))),
+                    child: Padding(
+                        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                        child: Row(
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(cntxt);
+                                  launchUrlString("https://play.google.com/store/apps/developer?id=Blue+Stone+Studio");
+                                },
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.apps,
+                                      size: 28,
+                                      color: Colors.lightBlueAccent,
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                        child: Text(
+                                          'More Apps',
+                                          style: TextStyle(fontSize: 12.0, color: Colors.black87),
+                                        ))
+                                  ],
+                                )),
+                            Spacer(),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(cntxt);
+                                  launchUrlString("https://play.google.com/store/apps/details?id=com.totp.veda");
+                                },
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.star,
+                                      size: 28,
+                                      color: Colors.lightBlueAccent,
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                        child: Text(
+                                          'Rate this app',
+                                          style: TextStyle(fontSize: 12.0, color: Colors.black87),
+                                        ))
+                                  ],
+                                )),
+                            Spacer(),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(cntxt);
+                                  Share.share(
+                                      'Hey! Checkout this App.\nVeda, Upanishad & Geeta and more.. in three languages.\n\n'
+                                      'https://play.google.com/store/apps/details?id=com.totp.veda',
+                                      subject: 'Vedic Wisdom');
+                                },
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.share,
+                                      size: 27,
+                                      color: Colors.lightBlueAccent,
+                                    ),
+                                    Padding(
+                                        padding: EdgeInsets.fromLTRB(0, 6, 0, 0),
+                                        child: Text(
+                                          'Share this App',
+                                          style: TextStyle(fontSize: 12.0, color: Colors.black87),
+                                        ))
+                                  ],
+                                )),
+                          ],
+                        ))),
               ],
             ));
       },
@@ -194,21 +230,23 @@ class MyHomePageState extends State<MyHomePage> {
     ctx = context;
     return Scaffold(
         backgroundColor: Global.canvasColor(),
-        appBar: AppBar( leading: TextButton(
-            onPressed: () {
-              menuDialog(context);
-            },
-            child: Padding(
-                padding: EdgeInsets.fromLTRB(15, 2, 0, 0),
-                child: Icon(
-                  Icons.menu,
-                  size: 25,
-                  color: Colors.white,
-                ))),
+        appBar: AppBar(
+          backgroundColor: Colors.lightBlueAccent,
+          // leading: TextButton(
+          //     onPressed: () {
+          //       menuDialog(context);
+          //     },
+          //     child: Padding(
+          //         padding: EdgeInsets.fromLTRB(15, 2, 0, 0),
+          //         child: Icon(
+          //           Icons.menu,
+          //           size: 25,
+          //           color: Colors.white,
+          //         ))),
           iconTheme: IconThemeData(color: Colors.white),
           //  elevation: 0,
           title: Text(
-            'The Knowledge',
+            'Vedic Wisdom',
             style: TextStyle(color: Colors.white),
           ),
           actions: [
@@ -227,8 +265,7 @@ class MyHomePageState extends State<MyHomePage> {
                   Global.saveSettings();
                   setState(() {});
                 },
-                icon:
-                    Icon(Global.settings['theme'] == 'dark' ? Icons.wb_sunny : Icons.nights_stay, color: Colors.white))
+                icon: Icon(Global.settings['theme'] == 'dark' ? Icons.wb_sunny : Icons.nights_stay, color: Colors.white))
           ],
         ),
         body: Stack(
@@ -253,120 +290,72 @@ class MyHomePageState extends State<MyHomePage> {
             Flex(
               direction: Axis.vertical,
               children: [
+                Expanded(flex: 0, child: adsUnits.googleBannerAd1()),
                 Expanded(
                     flex: 1,
-                    child: FutureBuilder(
-                        future: Global.loadingVedaFromAssets(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return Container(
-                              child: ListView(
-                                padding: EdgeInsets.fromLTRB(20, 20, 0, 10),
-                                //  maxCrossAxisExtent: 150,
-                                //crossAxisCount: 2,
-                                shrinkWrap: true,
-                                children: [
-                                  GestureDetector(
-                                      onTap: () async {
-                                        if (await DeviceApps.isAppInstalled('com.bss.gita')) {
-                                          DeviceApps.openApp('com.bss.gita');
-                                        } else {
-                                          launch('https://play.google.com/store/apps/details?id=com.bss.gita');
-                                        }
-                                      },
-                                      child: Padding(
-                                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                          child: Wrap(
-                                            alignment: WrapAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                Global.listOfChakraImage[0],
-                                                height: 70,
-                                                width: 70,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(10, 20, 0, 0),
-                                                child: Text(Global.gitaTitle(),
-                                                    style: TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: Global.normalTextColor())),
-                                              )
-                                            ],
-                                          ))),
-                                  GestureDetector(
-                                      onTap: () async {
-                                        if (await DeviceApps.isAppInstalled('com.bhartiyadarshan.upanishad')) {
-                                          DeviceApps.openApp('com.bhartiyadarshan.upanishad');
-                                        } else {
-                                          launch(
-                                              'https://play.google.com/store/apps/details?id=com.bhartiyadarshan.upanishad');
-                                        }
-                                      },
-                                      child: Padding(
-                                          padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                          child: Wrap(
-                                            alignment: WrapAlignment.start,
-                                            children: [
-                                              Image.asset(
-                                                Global.listOfChakraImage[1],
-                                                height: 50,
-                                                width: 50,
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
-                                                child: Text(Global.upanishadTitle(),
-                                                    style: TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: Global.normalTextColor())),
-                                              )
-                                            ],
-                                          ))),
-                                  for (int indexOfText = 0; indexOfText < Global.veda().length; indexOfText++)
-                                    GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => TextReading(indexOfText),
-                                              )).then((value) {
-                                            adsUnits.showInterAd();
-                                          });
-                                        },
-                                        child: Padding(
-                                            padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
-                                            child: Wrap(
-                                              alignment: WrapAlignment.start,
-                                              children: [
-                                                Image.asset(
-                                                  Global.listOfChakraImage[indexOfText + 2],
-                                                  height: 50,
-                                                  width: 50,
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
-                                                  child: Text(
-                                                      Global.veda()[indexOfText].toString().capitalizeFirstofEach,
-                                                      style: TextStyle(
-                                                          fontSize: 28,
-                                                          fontWeight: FontWeight.w600,
-                                                          color: Global.normalTextColor())),
-                                                )
-                                              ],
-                                            )))
-                                ],
-                              ),
-                            );
-                          } else {
-                            return Center(
-                              child: Column(
-                                children: [Spacer(), CircularProgressIndicator(), Spacer()],
-                              ),
-                            );
-                          }
-                        })),
-                Expanded(flex: 0, child: adsUnits.googleBannerAd())
+                    child: Container(
+                      child: ListView(
+                        padding: EdgeInsets.fromLTRB(20, 20, 0, 10),
+                        //  maxCrossAxisExtent: 150,
+                        //crossAxisCount: 2,
+                        shrinkWrap: true,
+                        children: [
+                          for (int i = 0; i < Global.titles.length; i++)
+                            Global.titles.keys.toList()[i] == 'More...'
+                                ? GestureDetector(
+                                    onTap: () {
+                                      menuDialog(context);
+                                    },
+                                    child: Padding(
+                                        padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                                        child: Wrap(
+                                          alignment: WrapAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                              Global.listOfChakraImage[i + 2],
+                                              height: 50,
+                                              width: 50,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
+                                              child: Text(Global.titles.keys.toList()[i].toString().capitalizeFirstofEach,
+                                                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Global.normalTextColor())),
+                                            )
+                                          ],
+                                        )))
+                                : GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => TitleList(Global.titles.keys.toList()[i]),
+                                          )).then((value) {
+                                        adsUnits.showInterAd();
+                                      });
+                                    },
+                                    child: Padding(
+                                        padding: EdgeInsets.fromLTRB(10, 10, 0, 10),
+                                        child: Wrap(
+                                          alignment: WrapAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                              Global.listOfChakraImage[i + 2],
+                                              height: 50,
+                                              width: 50,
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
+                                              child: Text(
+                                                  Global.titles[Global.titles.keys.toList()[i]]['mainTitle'][Global.settings['language']]
+                                                      .toString()
+                                                      .capitalizeFirstofEach,
+                                                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, color: Global.normalTextColor())),
+                                            )
+                                          ],
+                                        )))
+                        ],
+                      ),
+                    )),
               ],
             )
           ],

@@ -12,9 +12,6 @@ class ConvertData {
     print(DateTime.now());
     List files = [];
 
-    // final manifestJson = await rootBundle.loadString('AssetManifest.json');
-    // final veda = (json.decode(manifestJson).keys.where((String key) => key.startsWith('assets/veda'))).toList();
-
     String path = (await getApplicationDocumentsDirectory()).path + '/allText/veda/';
     Directory dir = Directory(path);
     files = await dir.list().toList();
@@ -33,7 +30,7 @@ class ConvertData {
           } else if (dataList[i].toString().contains('title3::')) {
             Map map = {'type': 'title3', 'data': dataList[i].toString().replaceAll('title3::', '').trim()};
             finalData.add(map);
-          } else if (dataList[i].toString().contains('verse::')) {
+          } else /*if (dataList[i].toString().contains('verse::'))*/ {
             Map map = {'type': 'verse', 'data': dataList[i].toString().replaceAll('verse::', '').trim()};
             finalData.add(map);
           }
